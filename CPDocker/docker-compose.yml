@@ -1,0 +1,40 @@
+version: "3"
+services:
+
+  db:
+    container_name: db
+    image: mariadb
+    environment:
+      MARIADB_USER: root
+      MARIADB_PASSWORD: root
+      MARIADB_DATABASE: employees
+      MARIADB_ROOT_PASSWORD: root
+    command: --default-authentication-plugin=mariadb_native_password
+    ports:
+      - "3305:3305"
+    networks:
+      - employees_network
+    volumes:
+      - db_data:/var/lib/mariadb
+  app:
+    container_name: employees
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      DB_HOST: db
+      DB_PORT: 3305
+      DB_NAME: employees
+      DB_USER: root
+      DB_PASSWORD: root
+      AUTH_PLUGIN: mariadb_native_password
+    depends_on:
+      - db
+    networks:
+      - employees_network
+
+networks:
+  employees_network:
+
+volumes:
+  db_data:
